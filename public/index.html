@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fitrox - Kalori & Diyet Takip</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- ÜST KISIM: LOGO + UYGULAMA ADI -->
+      <header class="app-header">
+        <div class="logo-row">
+          <!-- BURADAKİ fitrox.png DOSYA ADINI KENDİ LOGONA GÖRE DEĞİŞTİREBİLİRSİN -->
+          <img src="/images/fitrox-logo.png" alt="Fitrox Logo" class="app-logo" />
+
+          <div class="header-text">
+            <h1>Fitrox</h1>
+            <p>Sporcular için kalori, diyet ve performans asistanı</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- SEKME BUTONLARI -->
+      <nav class="tab-nav">
+        <button class="tab-button active" data-page="pageKalori">🔥 Kalori Takip</button>
+        <button class="tab-button" data-page="pageDiyet">📝 Diyet Listem</button>
+        <button class="tab-button" data-page="pageHazir">📅 Hazır Diyetler</button>
+        <button class="tab-button" data-page="pageAntreman">🏋️ Antrenman</button>
+        <button class="tab-button" data-page="pageSu">💧 Su Takibi</button>
+        <button class="tab-button" data-page="pageProfil">👤 Profil</button>
+        <button class="tab-button" data-page="pageSupplement">🧪 Supplement</button>
+      </nav>
+
+      <!-- 1. SAYFA: KALORİ TAKİP -->
+      <div id="pageKalori" class="page active">
+        <!-- Günlük Hedefler -->
+        <section class="targets-card">
+          <h2>🎯 Günlük Hedeflerin</h2>
+          <div class="targets-grid">
+            <div class="target-item">
+              <label for="targetKcalInput">Kalori (kcal)</label>
+              <input type="number" id="targetKcalInput" placeholder="Örn: 2500" min="0" />
+            </div>
+            <div class="target-item">
+              <label for="targetProteinInput">Protein (g)</label>
+              <input type="number" id="targetProteinInput" placeholder="Örn: 180" min="0" />
+            </div>
+            <div class="target-item">
+              <label for="targetCarbInput">Karbonhidrat (g)</label>
+              <input type="number" id="targetCarbInput" placeholder="Örn: 250" min="0" />
+            </div>
+            <div class="target-item">
+              <label for="targetFatInput">Yağ (g)</label>
+              <input type="number" id="targetFatInput" placeholder="Örn: 70" min="0" />
+            </div>
+          </div>
+          <button id="saveTargetsButton">Hedefleri Kaydet</button>
+        </section>
+
+        <!-- Besin Ekleme -->
+        <section class="input-card">
+          <h2>🍽️ Öğününe Besin Ekle</h2>
+          <label for="mealTypeSelect">Öğün seç</label>
+          <select id="mealTypeSelect">
+            <option value="Kahvaltı">Kahvaltı</option>
+            <option value="Öğle">Öğle</option>
+            <option value="Akşam">Akşam</option>
+            <option value="Ara Öğün">Ara Öğün</option>
+          </select>
+
+          <label for="foodSelect">Besin seç</label>
+          <select id="foodSelect"></select>
+
+          <label for="gramsInput">Miktar (gram)</label>
+          <input type="number" id="gramsInput" placeholder="Örn: 150" min="1" value="100" />
+
+          <button id="addButton">Listeye Ekle</button>
+        </section>
+
+        <!-- Günlük Liste -->
+        <section class="log-card">
+          <h2>📊 Günlük Öğün Listesi</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Öğün</th>
+                <th>Besin</th>
+                <th>Gram</th>
+                <th>Kcal</th>
+                <th>P</th>
+                <th>K</th>
+                <th>Y</th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+          </table>
+          <button id="clearButton" class="clear-btn">Listeyi Temizle</button>
+        </section>
+
+        <!-- Toplamlar + Progress -->
+        <section class="summary-card">
+          <h2>📈 Toplam Değerler (Gün)</h2>
+
+          <div class="summary-row">
+            <span>Kalori:</span>
+            <div class="summary-values">
+              <span><strong id="totalKcal">0</strong> / <span id="targetKcal">0</span> kcal</span>
+              <span class="percent" id="percentKcal">0%</span>
+            </div>
+            <div class="progress-bar"><div id="barKcal" class="progress-fill"></div></div>
+          </div>
+
+          <div class="summary-row">
+            <span>Protein:</span>
+            <div class="summary-values">
+              <span><strong id="totalProtein">0</strong> / <span id="targetProtein">0</span> g</span>
+              <span class="percent" id="percentProtein">0%</span>
+            </div>
+            <div class="progress-bar"><div id="barProtein" class="progress-fill"></div></div>
+          </div>
+
+          <div class="summary-row">
+            <span>Karbonhidrat:</span>
+            <div class="summary-values">
+              <span><strong id="totalCarb">0</strong> / <span id="targetCarb">0</span> g</span>
+              <span class="percent" id="percentCarb">0%</span>
+            </div>
+            <div class="progress-bar"><div id="barCarb" class="progress-fill"></div></div>
+          </div>
+
+          <div class="summary-row">
+            <span>Yağ:</span>
+            <div class="summary-values">
+              <span><strong id="totalFat">0</strong> / <span id="targetFat">0</span> g</span>
+              <span class="percent" id="percentFat">0%</span>
+            </div>
+            <div class="progress-bar"><div id="barFat" class="progress-fill"></div></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 2. SAYFA: DİYET LİSTEM -->
+      <div id="pageDiyet" class="page">
+        <section class="input-card">
+          <h2>📝 Diyet Listem</h2>
+          <p class="helper-text">
+            Buraya kendi diyet planını yazabilirsin. Örneğin
+            "Kahvaltı: 100g yulaf + 200ml süt + 1 muz" gibi.
+          </p>
+
+          <label for="dietMealSelect">Öğün seç</label>
+          <select id="dietMealSelect">
+            <option value="Kahvaltı">Kahvaltı</option>
+            <option value="Öğle">Öğle</option>
+            <option value="Akşam">Akşam</option>
+            <option value="Ara Öğün">Ara Öğün</option>
+          </select>
+
+          <label for="dietTextInput">İçerik / Açıklama</label>
+          <textarea
+            id="dietTextInput"
+            class="diet-textarea"
+            placeholder="Örnek: 100g yulaf, 200ml süt, 1 muz"
+          ></textarea>
+
+          <button id="dietAddButton">Diyet Listesine Ekle</button>
+        </section>
+
+        <section class="log-card">
+          <h2>📋 Kayıtlı Diyet Listesi</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Öğün</th>
+                <th>Açıklama</th>
+              </tr>
+            </thead>
+            <tbody id="dietTableBody"></tbody>
+          </table>
+          <button id="dietClearButton" class="clear-btn">
+            Diyet Listesini Temizle
+          </button>
+        </section>
+      </div>
+
+      <!-- 3. SAYFA: HAZIR DİYETLER -->
+      <div id="pageHazir" class="page">
+        <section class="input-card">
+          <h2>📅 Hazır 7 Günlük Diyet Listeleri</h2>
+          <p class="helper-text">
+            Bu listeler örnektir. Kendi hedeflerine ve sağlık durumuna göre mutlaka kişiselleştir.
+          </p>
+        </section>
+
+        <section class="log-card ready-diets">
+          <!-- 1. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 1. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 3 yumurta (2 beyaz + 1 tam), 60 g yulaf, 1 muz</li>
+              <li><strong>Ara Öğün:</strong> 1 avuç badem, 1 elma</li>
+              <li><strong>Öğle:</strong> 200 g ızgara tavuk, 150 g pirinç pilavı, yoğurt</li>
+              <li><strong>Ara Öğün:</strong> 1 ölçek whey + su</li>
+              <li><strong>Akşam:</strong> 200 g somon, 200 g sebze (brokoli / kabak / ıspanak)</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="1">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="1">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+
+          <!-- 2. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 2. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 2 tam yumurta + 2 yumurta beyazı, 2 dilim tam buğday ekmek, 1 portakal</li>
+              <li><strong>Ara Öğün:</strong> 150 g probiyotik yoğurt</li>
+              <li><strong>Öğle:</strong> 150 g kırmızı et, 150 g bulgur, mevsim salata</li>
+              <li><strong>Ara Öğün:</strong> 1 avuç ceviz</li>
+              <li><strong>Akşam:</strong> 200 g tavuk sote, 1 tabak sebze yemeği</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="2">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="2">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+
+          <!-- 3. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 3. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 150 g yulaf + süt, 1 tatlı kaşığı bal, 1 muz</li>
+              <li><strong>Ara Öğün:</strong> 1 adet muz, 30 g fındık</li>
+              <li><strong>Öğle:</strong> 200 g ızgara hindi, 150 g makarna, 1 kase ayran</li>
+              <li><strong>Ara Öğün:</strong> 1 ölçek whey</li>
+              <li><strong>Akşam:</strong> 250 g levrek / çupra, 150 g haşlanmış patates, salata</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="3">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="3">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+
+          <!-- 4. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 4. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 3 yumurta omlet, 1 dilim beyaz peynir, 1 domates, 1 salatalık</li>
+              <li><strong>Ara Öğün:</strong> 1 elma, 1 avuç badem</li>
+              <li><strong>Öğle:</strong> 200 g tavuk şiş, 120 g bulgur, yoğurt</li>
+              <li><strong>Ara Öğün:</strong> 150 g kefir</li>
+              <li><strong>Akşam:</strong> 200 g dana rosto, 200 g haşlanmış sebze</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="4">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="4">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+
+          <!-- 5. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 5. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 120 g yulaf, 30 g fıstık ezmesi, 1 muz</li>
+              <li><strong>Ara Öğün:</strong> 2 adet mandalina</li>
+              <li><strong>Öğle:</strong> 200 g ızgara tavuk, 200 g makarna, salata</li>
+              <li><strong>Ara Öğün:</strong> 1 avuç kaju</li>
+              <li><strong>Akşam:</strong> 200 g kıyma ile sebze yemeği, 1 kase yoğurt</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="5">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="5">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+
+          <!-- 6. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 6. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 3 yumurta haşlanmış, 2 dilim tam buğday ekmek, 1 adet avokado (yarım)</li>
+              <li><strong>Ara Öğün:</strong> 200 ml ayran</li>
+              <li><strong>Öğle:</strong> 200 g somon, 150 g pirinç, yeşil salata</li>
+              <li><strong>Ara Öğün:</strong> 30 g ceviz, 1 muz</li>
+              <li><strong>Akşam:</strong> 200 g tavuk göğüs, 1 tabak sebze sote</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="6">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="6">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+
+          <!-- 7. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 7. Gün</h3>
+            <ul>
+              <li><strong>Kahvaltı:</strong> 4 yumurta beyazı + 1 tam, 50 g yulaf, 1 kivi</li>
+              <li><strong>Ara Öğün:</strong> 1 ölçek whey, 1 adet muz</li>
+              <li><strong>Öğle:</strong> 200 g ızgara kırmızı et, 150 g bulgur, 1 kase ayran</li>
+              <li><strong>Ara Öğün:</strong> 1 avuç fındık</li>
+              <li><strong>Akşam:</strong> 200 g hindi, 1 tabak haşlanmış sebze</li>
+            </ul>
+            <button class="copy-ready-btn" data-day="7">
+              ➕ Bu günü "Diyet Listem"e kopyala
+            </button>
+            <button class="diet-target-btn" data-day="7">
+              🎯 Bu güne göre hedef öner
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- 4. SAYFA: ANTRENMAN PROGRAMI -->
+      <div id="pageAntreman" class="page">
+        <section class="input-card">
+          <h2>🏋️ 7 Günlük Antrenman Programı</h2>
+          <p class="helper-text">
+            Bu program, spor salonu veya evde ağırlık çalışmalarına uygundur.
+            Yoğunluğunu seviyene göre set/tekrarlarla oynayarak ayarlayabilirsin.
+          </p>
+        </section>
+
+        <section class="log-card ready-diets">
+          <!-- 1. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 1. Gün – Göğüs + Triceps + Kardiyo</h3>
+            <p><strong>Isınma (5–7 dk)</strong></p>
+            <ul>
+              <li>Tempolu yürüyüş veya hafif koşu</li>
+              <li>10 x shoulder rotation</li>
+              <li>10 x chest opener stretch</li>
+            </ul>
+            <p><strong>Ağırlık Antrenmanı</strong></p>
+            <ul>
+              <li>Bench Press – 4 x 8–12</li>
+              <li>Incline Dumbbell Press – 4 x 10</li>
+              <li>Cable Fly – 3 x 12–15</li>
+              <li>Dips – 3 x maks.</li>
+              <li>Triceps Rope Pushdown – 3 x 12</li>
+              <li>Skull Crusher – 3 x 10</li>
+            </ul>
+            <p><strong>Kardiyo (10 dk)</strong></p>
+            <ul>
+              <li>Hafif tempo koşu veya incline yürüyüş</li>
+            </ul>
+            <button class="workout-target-btn" data-day="1">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+
+          <!-- 2. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 2. Gün – Sırt + Biceps</h3>
+            <p><strong>Isınma</strong></p>
+            <ul>
+              <li>Rowing machine 5 dk</li>
+              <li>Omuz mobilite (10 tekrar)</li>
+            </ul>
+            <p><strong>Ağırlık Antrenmanı</strong></p>
+            <ul>
+              <li>Barfiks / Lat Pulldown – 4 x 8–12</li>
+              <li>Seated Cable Row – 4 x 10</li>
+              <li>T-Bar Row – 3 x 8–10</li>
+              <li>Dumbbell Row – 3 x 10</li>
+              <li>Barbell Curl – 3 x 10–12</li>
+              <li>Hammer Curl – 3 x 12</li>
+            </ul>
+            <p><strong>Bitiriş</strong></p>
+            <ul>
+              <li>5 dk düşük tempolu bisiklet</li>
+            </ul>
+            <button class="workout-target-btn" data-day="2">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+
+          <!-- 3. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 3. Gün – Bacak + Karın</h3>
+            <p><strong>Isınma</strong></p>
+            <ul>
+              <li>5 dk yürüyüş</li>
+              <li>Quadriceps &amp; hamstring açma hareketleri</li>
+            </ul>
+            <p><strong>Ağırlık Antrenmanı</strong></p>
+            <ul>
+              <li>Squat – 4 x 8–10</li>
+              <li>Leg Press – 4 x 12</li>
+              <li>Romanian Deadlift – 3 x 10</li>
+              <li>Lunges – 3 x 12</li>
+              <li>Leg Extension – 3 x 15</li>
+              <li>Leg Curl – 3 x 15</li>
+              <li>Crunch – 3 x 20</li>
+              <li>Plank – 3 x 45 sn</li>
+            </ul>
+            <p><strong>Kardiyo</strong></p>
+            <ul>
+              <li>8 dk merdiven veya incline yürüyüş</li>
+            </ul>
+            <button class="workout-target-btn" data-day="3">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+
+          <!-- 4. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 4. Gün – Omuz + Karın + Kısa Kardiyo</h3>
+            <p><strong>Isınma</strong></p>
+            <ul>
+              <li>3 dk ip atlama</li>
+              <li>Omuz rotasyonları</li>
+            </ul>
+            <p><strong>Ağırlık Antrenmanı</strong></p>
+            <ul>
+              <li>Shoulder Press – 4 x 8–12</li>
+              <li>Lateral Raise – 4 x 12–15</li>
+              <li>Front Raise – 3 x 12</li>
+              <li>Bent Over Lateral Raise – 3 x 12</li>
+              <li>Shrug – 3 x 12–15</li>
+              <li>Russian Twist – 3 x 30 sn</li>
+              <li>Leg Raise – 3 x 12–15</li>
+            </ul>
+            <p><strong>Kardiyo</strong></p>
+            <ul>
+              <li>10 dk hafif tempo koşu (isteğe bağlı)</li>
+            </ul>
+            <button class="workout-target-btn" data-day="4">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+
+          <!-- 5. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 5. Gün – Full Body (Tüm Vücut)</h3>
+            <p><strong>Isınma</strong></p>
+            <ul><li>5 dk bisiklet</li></ul>
+            <p><strong>Ağırlık Antrenmanı</strong></p>
+            <ul>
+              <li>Deadlift – 4 x 6–8</li>
+              <li>Bench Press – 3 x 10</li>
+              <li>Bent Over Row – 3 x 10</li>
+              <li>Dumbbell Shoulder Press – 3 x 12</li>
+              <li>Plank – 3 x 1 dk</li>
+              <li>Mountain Climber – 3 x 30 sn</li>
+            </ul>
+            <p><strong>Kardiyo</strong></p>
+            <ul><li>12 dk interval koşu (1 dk koşu / 1 dk hızlı yürüyüş)</li></ul>
+            <button class="workout-target-btn" data-day="5">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+
+          <!-- 6. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 6. Gün – Kardiyo + Core (Yağ Yakım Günü)</h3>
+            <p><strong>Isınma</strong></p>
+            <ul><li>3 dk ip atlama</li></ul>
+            <p><strong>Kardiyo Programı</strong></p>
+            <ul>
+              <li>20 dk HIIT koşu → 1 dk hızlı koş / 1 dk dinlenme</li>
+              <li>10 dk tempolu yürüyüş</li>
+              <li>10 dk bisiklet (orta tempo)</li>
+            </ul>
+            <p><strong>Core Çalışma</strong></p>
+            <ul>
+              <li>Crunch – 3 x 25</li>
+              <li>Plank – 3 x 1 dk</li>
+              <li>Side Plank – 3 x 40 sn</li>
+              <li>Bicycle Crunch – 3 x 20</li>
+            </ul>
+            <button class="workout-target-btn" data-day="6">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+
+          <!-- 7. GÜN -->
+          <div class="ready-plan-card">
+            <h3>📅 7. Gün – Aktif Dinlenme / Mobilite</h3>
+            <p><strong>Hafif Aktiviteler (Seçimli)</strong></p>
+            <ul>
+              <li>30 dk yürüyüş</li>
+              <li>Hafif koşu 10 dk</li>
+              <li>Stretching 15–20 dk</li>
+            </ul>
+            <p><strong>Mobilite Rutinleri</strong></p>
+            <ul>
+              <li>Kalça açma hareketleri</li>
+              <li>Omuz mobilite lastikle 10 tekrar</li>
+              <li>Göğüs ve sırt esnetme</li>
+              <li>Bel – hamstring esnetme</li>
+            </ul>
+            <button class="workout-target-btn" data-day="7">
+              🎯 Bu antrenman gününe göre hedef öner
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- 5. SAYFA: SU TAKİBİ -->
+      <div id="pageSu" class="page">
+        <section class="input-card">
+          <h2>💧 Su Takibi</h2>
+          <p class="helper-text">
+            Günlük su tüketimini takip et. Varsayılan hedef 3000 ml olarak ayarlayabilirsin.
+          </p>
+
+          <label for="waterTargetInput">Günlük su hedefi (ml)</label>
+          <input type="number" id="waterTargetInput" min="0" placeholder="Örn: 3000" />
+
+          <button id="waterSaveTargetButton">Su hedefini kaydet</button>
+        </section>
+
+        <section class="summary-card">
+          <h2>Bugünkü Su Durumu</h2>
+          <p id="waterStatusText" class="helper-text"></p>
+
+          <div class="water-buttons">
+            <button id="waterAdd250">+250 ml</button>
+            <button id="waterAdd500">+500 ml</button>
+          </div>
+
+          <div class="water-custom">
+            <input
+              type="number"
+              id="waterCustomInput"
+              placeholder="Örn: 200"
+              min="0"
+            />
+            <button id="waterAddCustom">+ Ekle</button>
+          </div>
+
+          <div class="summary-row">
+            <span>Toplam Su:</span>
+            <div class="summary-values">
+              <span><strong id="waterCurrent">0</strong> / <span id="waterTargetText">0</span> ml</span>
+              <span class="percent" id="waterPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div id="waterBar" class="progress-fill"></div>
+            </div>
+          </div>
+
+          <button id="waterResetButton" class="clear-btn">
+            Bugünkü suyu sıfırla
+          </button>
+        </section>
+      </div>
+
+      <!-- 6. SAYFA: PROFİL -->
+      <div id="pageProfil" class="page">
+        <section class="input-card">
+          <h2>👤 Profil Ayarları</h2>
+          <p class="helper-text">
+            Kilo, boy, yaş ve aktivite düzeyine göre önerilen günlük kalori ve makro
+            hedeflerini hesaplayabilirsin.
+          </p>
+
+          <label for="profileWeight">Kilo (kg)</label>
+          <input type="number" id="profileWeight" min="0" placeholder="Örn: 80" />
+
+          <label for="profileHeight">Boy (cm)</label>
+          <input type="number" id="profileHeight" min="0" placeholder="Örn: 180" />
+
+          <label for="profileAge">Yaş</label>
+          <input type="number" id="profileAge" min="0" placeholder="Örn: 28" />
+
+          <label for="profileGender">Cinsiyet</label>
+          <select id="profileGender">
+            <option value="male">Erkek</option>
+            <option value="female">Kadın</option>
+          </select>
+
+          <label for="profileActivity">Aktivite Düzeyi</label>
+          <select id="profileActivity">
+            <option value="sedentary">Düşük (masa başı)</option>
+            <option value="light">Hafif aktif (haftada 1-2 gün)</option>
+            <option value="moderate">Orta aktif (haftada 3-4 gün)</option>
+            <option value="high">Yüksek (haftada 5+ gün)</option>
+          </select>
+
+          <button id="profileSaveButton">Profili Kaydet</button>
+        </section>
+
+        <section class="summary-card">
+          <h2>📊 Profil Bazlı Öneri</h2>
+          <p class="helper-text">
+            Bu hesaplama yaklaşık değerdir. Sağlık durumun için mutlaka uzmana danış.
+          </p>
+
+          <div class="summary-row">
+            <span>Önerilen Kalori:</span>
+            <div class="summary-values">
+              <span><strong id="profileCalcKcal">0</strong> kcal / gün</span>
+            </div>
+          </div>
+          <div class="summary-row">
+            <span>Protein:</span>
+            <div class="summary-values">
+              <span><strong id="profileCalcProtein">0</strong> g</span>
+            </div>
+          </div>
+          <div class="summary-row">
+            <span>Karbonhidrat:</span>
+            <div class="summary-values">
+              <span><strong id="profileCalcCarb">0</strong> g</span>
+            </div>
+          </div>
+          <div class="summary-row">
+            <span>Yağ:</span>
+            <div class="summary-values">
+              <span><strong id="profileCalcFat">0</strong> g</span>
+            </div>
+          </div>
+
+          <button id="profileApplyTargetsButton">
+            🎯 Bu öneriyi günlük hedef olarak kullan
+          </button>
+        </section>
+      </div>
+
+      <!-- 7. SAYFA: SUPPLEMENT REHBERİ -->
+      <div id="pageSupplement" class="page">
+        <section class="input-card">
+          <h2>S U P P L E M E N T  R E H B E R İ</h2>
+          <p class="helper-text">
+            Sporcular için bilimsel temelli takviye kılavuzu. Kullanmadan önce sağlık
+            profesyoneline danışman önerilir.
+          </p>
+        </section>
+
+        <section class="log-card ready-diets">
+          <div class="ready-plan-card">
+            <h3>🟩 1) Whey Protein</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Kas onarımı ve kas kütlesi artışını destekler</li>
+              <li>Antrenman sonrası toparlanmayı hızlandırır</li>
+              <li>Pratik protein kaynağıdır</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Antrenman sonrası 0–60 dakika içinde, gün içinde protein açığı varsa</p>
+            <p><strong>Kimler İçin?</strong> Kas geliştirmek isteyen sporcular, günlük protein hedefini besinden karşılamakta zorlananlar</p>
+            <p><strong>Kullanım:</strong> 1 ölçek (20–25 g protein) su veya süt ile</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 2) Kreatin Monohidrat</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Güç artışı sağlar</li>
+              <li>Patlayıcı kuvveti artırır (bench press, squat, sprint)</li>
+              <li>Kaslarda su tutarak hacmi artırır</li>
+            </ul>
+            <p>Bilimsel olarak en etkili supplementlerden biridir.</p>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Günde 1 kez (5 g) her zaman aynı saatte, antrenman öncesi veya sonrası fark etmez</p>
+            <p><strong>Kimler İçin?</strong> Güç/performans artırmak isteyen herkes (kadın/erkek)</p>
+            <p><strong>Kullanım:</strong> 5 g günlük sürekli kullanım, yükleme şart değil</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 3) BCAA (Lösin – İzolösin – Valin)</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Kas yıkımını azaltır</li>
+              <li>Uzun antrenmanlarda dayanıklılığı artırır</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Antrenman sırasında, yoğun/uzun kardiyo günlerinde</p>
+            <p><strong>Kimler İçin?</strong> Uzun antrenman yapan yüzücüler, koşucular, crossfit sporcuları</p>
+            <p><strong>Kullanım:</strong> 5–10 g antrenman sırasında</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 4) Pre-Workout (Antrenman Öncesi Karışım)</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Enerji, fokus ve güç artışı sağlar</li>
+              <li>Yorgunluk hissini azaltır</li>
+            </ul>
+            <p><strong>Genelde İçerik:</strong> Kafein, beta alanin, citrulline malate, BCAA, kreatin</p>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Antrenmandan 20–30 dakika önce</p>
+            <p><strong>Kimler İçin?</strong> Enerji düşüklüğü yaşayanlar, sabah erken veya işten sonra spor yapanlar</p>
+            <p><strong>Kullanım:</strong> Ürün ölçüsüne göre 1 porsiyon</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 5) Omega-3 (Balık Yağı)</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Eklem sağlığını destekler</li>
+              <li>İltihaplanmayı azaltır</li>
+              <li>Kalp ve beyin fonksiyonlarını destekler</li>
+              <li>Yağ yakımına dolaylı olarak katkı sağlar</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Yemekle birlikte (sabah veya akşam)</p>
+            <p><strong>Kimler İçin?</strong> Tüm sporcular, özellikle eklem sorunu yaşayanlar</p>
+            <p><strong>Kullanım:</strong> Günlük toplam 1000–2000 mg EPA + DHA</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 6) Multivitamin</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Vitamin/mineral eksikliklerini kapatmaya yardımcı olur</li>
+              <li>Enerji düzeyini ve bağışıklığı destekler</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Sabah kahvaltıyla</p>
+            <p><strong>Kimler İçin?</strong> Düzenli spor yapanlar, yoğun çalışanlar, öğrenciler</p>
+            <p><strong>Kullanım:</strong> Günde 1 tablet (ürünün etiketine göre)</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 7) Glutamin</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Bağışıklık sistemini destekleyebilir</li>
+              <li>Yoğun antrenman sonrası toparlanmaya yardımcı olabilir</li>
+              <li>Bağırsak sağlığını destekler</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Antrenman sonrası ve gece yatmadan önce</p>
+            <p><strong>Kimler İçin?</strong> Yoğun hacim antrenmanı yapanlar, hastalık sonrası toparlanma süreci</p>
+            <p><strong>Kullanım:</strong> 5 g antrenman sonrası + 5 g gece</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 8) Citrulline Malate</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Kan akışını artırarak daha iyi “pump” sağlar</li>
+              <li>Dayanıklılığı ve ağırlık performansını artırabilir</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Antrenmandan 20–30 dakika önce</p>
+            <p><strong>Kimler İçin?</strong> Powerlifting, bodybuilding, crossfit sporcuları</p>
+            <p><strong>Kullanım:</strong> 6–8 g antrenman öncesi</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 9) Beta Alanin</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Kaslarda laktik asit birikimini azaltır</li>
+              <li>Sprint, HIIT, crossfit performansını artırabilir</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Günlük 3–6 g, bölünmüş dozlarda</p>
+            <p><strong>Kullanım Notu:</strong> Yüz ve ellerde karıncalanma hissi normal ve geçicidir.</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 10) L-Carnitine</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Yağ asitlerinin enerjiye dönüşümünü destekler</li>
+              <li>Özellikle kardiyoda yağ yakım sürecini destekleyebilir</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Kardiyodan 30 dakika önce</p>
+            <p><strong>Kimler İçin?</strong> Yağ oranını azaltmak isteyen sporcular</p>
+            <p><strong>Kullanım:</strong> 1000–2000 mg sıvı/ampul form</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟩 11) Kafein Tablet</h3>
+            <p><strong>Ne İşe Yarar?</strong></p>
+            <ul>
+              <li>Enerji ve mental fokus artırır</li>
+              <li>Dayanıklılık sporlarında performansı artırabilir</li>
+            </ul>
+            <p><strong>Ne Zaman Kullanılmalı?</strong> Antrenmandan 20–30 dakika önce</p>
+            <p><strong>Kullanım:</strong> 100–200 mg (kafein hassasiyetine göre)</p>
+          </div>
+
+          <div class="ready-plan-card">
+            <h3>🟦 Özet Tablo – Hangi Supplement Ne İşe Yarar?</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Supplement</th>
+                  <th>Amaç</th>
+                  <th>En İyi Zaman</th>
+                  <th>Kimler İçin?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Whey Protein</td>
+                  <td>Kas gelişimi</td>
+                  <td>Antrenman sonrası</td>
+                  <td>Tüm sporcular</td>
+                </tr>
+                <tr>
+                  <td>Kreatin</td>
+                  <td>Güç & hacim</td>
+                  <td>Günlük sabit</td>
+                  <td>Fitness/bodybuilding</td>
+                </tr>
+                <tr>
+                  <td>BCAA</td>
+                  <td>Dayanıklılık</td>
+                  <td>Antrenman sırasında</td>
+                  <td>Uzun antrenman yapanlar</td>
+                </tr>
+                <tr>
+                  <td>Pre-Workout</td>
+                  <td>Enerji & fokus</td>
+                  <td>Antrenman öncesi</td>
+                  <td>Herkes</td>
+                </tr>
+                <tr>
+                  <td>Omega-3</td>
+                  <td>Eklem & sağlık</td>
+                  <td>Yemekle birlikte</td>
+                  <td>Herkes</td>
+                </tr>
+                <tr>
+                  <td>Multivitamin</td>
+                  <td>Genel sağlık</td>
+                  <td>Sabah</td>
+                  <td>Herkes</td>
+                </tr>
+                <tr>
+                  <td>Glutamin</td>
+                  <td>Toparlanma</td>
+                  <td>Antrenman sonrası</td>
+                  <td>Yoğun hacim çalışanlar</td>
+                </tr>
+                <tr>
+                  <td>Citrulline</td>
+                  <td>Pump & performans</td>
+                  <td>Antrenman öncesi</td>
+                  <td>Fitness/powerlifting</td>
+                </tr>
+                <tr>
+                  <td>Beta Alanin</td>
+                  <td>Laktik asit azaltma</td>
+                  <td>Günlük</td>
+                  <td>Crossfit, HIIT</td>
+                </tr>
+                <tr>
+                  <td>L-Carnitine</td>
+                  <td>Yağ yakımı</td>
+                  <td>Kardiyodan önce</td>
+                  <td>Kilo vermek isteyenler</td>
+                </tr>
+                <tr>
+                  <td>Kafein</td>
+                  <td>Enerji & fokus</td>
+                  <td>Antrenman öncesi</td>
+                  <td>Herkes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
